@@ -161,7 +161,7 @@ int __cdecl main()
 			{
 				if (fabs(p[k + n] - matrixReference[m*yDimension + n]) > 0.01f)
 				{
-					printf("failure %f, %f\n", p[k + n], matrixReference[m*yDimension + n]);
+					//printf("failure %f, %f\n", p[k + n], matrixReference[m*yDimension + n]);
 					bSuccess = false;
 
 				    //break;
