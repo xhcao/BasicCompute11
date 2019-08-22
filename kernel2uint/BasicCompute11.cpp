@@ -21,8 +21,8 @@
 #endif
 
 // The number of texls
-const UINT xDimension = 2560;
-const UINT yDimension = 2560;
+const UINT xDimension = 1280;
+const UINT yDimension = xDimension;
 const UINT NUM_ELEMENTS = xDimension * yDimension;
 const UINT tiledSize = 32;
 
@@ -151,12 +151,12 @@ int __cdecl main()
     {
 		ID3D11Texture2D* debugTex = CreateAndCopyToDebugTex2D( g_pDevice, g_pContext, g_pMatrixCTexture);
         D3D11_MAPPED_SUBRESOURCE MappedResource; 
-        float *p;
+        UINT32 *p;
         g_pContext->Map(debugTex, 0, D3D11_MAP_READ, 0, &MappedResource );
 
         // Set a break point here and put down the expression "p, 1024" in your watch window to see what has been written out by our CS
         // This is also a common trick to debug CS programs.
-        p = (float*)MappedResource.pData;
+        p = (UINT32*)MappedResource.pData;
 		printf("RowPitch: %d, DepthPitch: %d\n", MappedResource.RowPitch, MappedResource.DepthPitch);
 
         // Verify that if Compute Shader has done right
@@ -164,15 +164,15 @@ int __cdecl main()
         bool bSuccess = true;
 		for (int m = 0; m < yDimension; m++)
 		{
-			int k = m * MappedResource.RowPitch / sizeof(float);
+			int k = m * MappedResource.RowPitch / sizeof(UINT32);
 			for (int n = 0; n < yDimension; n++)
 			{
-				if (fabs(p[k + n] - matrixReference[m*yDimension + n]) > 1)
+				if (p[k + n] != matrixReference[m*yDimension + n])
 				{
-					//printf("failure %f, %f\n", p[k + n], matrixReference[m*yDimension + n]);
+					printf("failure %u, %u\n", p[k + n], matrixReference[m*yDimension + n]);
 					bSuccess = false;
 
-				    //break;
+				    break;
 				}
 			}
 		}

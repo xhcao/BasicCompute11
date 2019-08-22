@@ -1,6 +1,6 @@
-#define M 2560
-#define N 2560
-#define K 2560
+#define M 1280
+#define N 1280
+#define K 1280
 #define TS 32
 Texture2D<uint> matrixA : register(t0);
 Texture2D<uint> matrixB : register(t1);
@@ -17,7 +17,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 LocalId : SV_GroupThreadID)
 	uint globalRow = TS * Gid.x + row;
 	uint globalCol = TS * Gid.y + col;
 
-	uint acc = 0.0f;
+	uint acc = 0;
 	uint numTiles = K / TS;
 	for (uint t = 0; t < numTiles; t++)
 	{

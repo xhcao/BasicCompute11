@@ -22,7 +22,7 @@
 
 // The number of texls
 const UINT xDimension = 1280;
-const UINT yDimension = 1280;
+const UINT yDimension = xDimension;
 const UINT NUM_ELEMENTS = xDimension * yDimension;
 const UINT tiledSize = 32;
 
@@ -161,10 +161,10 @@ int __cdecl main()
 			{
 				if (fabs(p[k + n] - matrixReference[m*yDimension + n]) > 0.01f)
 				{
-					//printf("failure %f, %f\n", p[k + n], matrixReference[m*yDimension + n]);
+					printf("failure %f, %f\n", p[k + n], matrixReference[m*yDimension + n]);
 					bSuccess = false;
 
-				    //break;
+				    break;
 				}
 			}
 		}

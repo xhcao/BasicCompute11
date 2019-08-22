@@ -1,6 +1,6 @@
-#define M 2560
-#define N 2560
-#define K 2560
+#define M 1280
+#define N 1280
+#define K 1280
 #define TS 32
 Texture2D<min16uint> matrixA : register(t0);
 Texture2D<min16uint> matrixB : register(t1);

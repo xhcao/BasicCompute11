@@ -21,8 +21,8 @@
 #endif
 
 // The number of texls
-const UINT xDimension = 2560;
-const UINT yDimension = 2560;
+const UINT xDimension = 1280;
+const UINT yDimension = xDimension;
 const UINT NUM_ELEMENTS = xDimension * yDimension;
 const UINT tiledSize = 32;
 
@@ -102,8 +102,8 @@ int __cdecl main()
 	}
     for ( int i = 0; i < NUM_ELEMENTS; ++i ) 
     {
-		matrixA[i] = static_cast <UINT16>(rand() % 10);
-		matrixB[i] = static_cast <UINT16>(rand() % 10);
+		matrixA[i] = static_cast <UINT16>(rand() % 5);
+		matrixB[i] = static_cast <UINT16>(rand() % 5);
 		matrixC[i] = 0;
     }
 
@@ -158,15 +158,15 @@ int __cdecl main()
         bool bSuccess = true;
 		for (int m = 0; m < yDimension; m++)
 		{
-			int k = m * MappedResource.RowPitch / sizeof(float);
+			int k = m * MappedResource.RowPitch / sizeof(UINT16);
 			for (int n = 0; n < yDimension; n++)
 			{
-				if (fabs(p[k + n] - matrixReference[m*yDimension + n]) > 1)
+				if (p[k + n] != matrixReference[m*yDimension + n])
 				{
-					//printf("failure %f, %f\n", p[k + n], matrixReference[m*yDimension + n]);
+					printf("failure %u, %u\n", p[k + n], matrixReference[m*yDimension + n]);
 					bSuccess = false;
 
-				    //break;
+				    break;
 				}
 			}
 		}
