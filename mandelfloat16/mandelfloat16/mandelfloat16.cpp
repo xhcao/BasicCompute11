@@ -51,7 +51,7 @@ LONGLONG timer = 0;
 WCHAR message[256];
 Timer time;
 // center coordiantes and pixel step size, for mandel and julia
-double a0[2], b0[2], da[2], db[2];
+float a0[2], b0[2], da[2], db[2];
 
 bool vsync = false; // redraw synced with screen refresh
 bool julia = false; // mandelbrot or julia
@@ -76,6 +76,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 HRESULT InitDevice();
 void CleanupDevice();
+void Render();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -114,6 +115,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+			Render();
         }
     }
 
@@ -387,7 +389,7 @@ HRESULT InitDevice()
 		return hr;
 	}
 
-	g_pd3dDeviceContext->OMGetRenderTargets(1, &g_pRenderTargetView, nullptr);
+	g_pd3dDeviceContext->OMSetRenderTargets(1, &g_pRenderTargetView, nullptr);
 
 	D3D11_VIEWPORT vp;
 	vp.Width = (FLOAT)width;
@@ -398,17 +400,24 @@ HRESULT InitDevice()
 	vp.TopLeftY = 0;
 	g_pd3dDeviceContext->RSSetViewports(1, &vp);
 
-	D3D11_BUFFER_DESC desc;
+	D3D11_BUFFER_DESC desc = {};
 	desc.Usage = D3D11_USAGE_DYNAMIC;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	desc.ByteWidth = ((sizeof(MandelConstantsNoDoubles) + 15) / 16) * 16;
-	g_pd3dDevice->CreateBuffer(&desc, NULL, &g_pcbFractal);
+	desc.ByteWidth = sizeof(MandelConstantsNoDoubles);
+	desc.MiscFlags = 0;
+	desc.StructureByteStride = 0;
+	hr = g_pd3dDevice->CreateBuffer(&desc, nullptr, &g_pcbFractal);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
 
 	DWORD dwShaderFlags = 0;
 
 	ID3DBlob* pCSBlob = nullptr;
-	hr = CompileShaderFromFile(L"Tutorial03.fx", "CS", "cs_5_0", &pCSBlob);
+	hr = CompileShaderFromFile(L"mandalfloat16.hlsl", "main", "cs_5_0", &pCSBlob);
 	if (FAILED(hr))
 	{
 		MessageBox(nullptr,
@@ -544,21 +553,23 @@ void Render()
 
 	i = (julia) ? 1 : 0;
 
+
 	// Fill constant buffer
 	D3D11_MAPPED_SUBRESOURCE msr;
+	MandelConstantsNoDoubles mc;
+	mc.a0 = (float)(a0[i] - da[i] * g_width / 2);
+	mc.b0 = (float)(b0[i] - db[i] * g_height / 2);
+	mc.da = (float)da[i];
+	mc.db = (float)db[i];
+	mc.ja0 = (float)a0[0];      // julia point
+	mc.jb0 = (float)b0[0];
+	mc.cycle = cycle;
+	mc.julia = julia;
+	mc.max_iterations = max_iterations;
 	g_pd3dDeviceContext->Map(g_pcbFractal, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
 
-		MandelConstantsNoDoubles mc;
-		mc.a0 = (float)(a0[i] - da[i] * g_width / 2);
-		mc.b0 = (float)(b0[i] - db[i] * g_height / 2);
-		mc.da = (float)da[i];
-		mc.db = (float)db[i];
-		mc.ja0 = (float)a0[0];      // julia point
-		mc.jb0 = (float)b0[0];
-		mc.cycle = cycle;
-		mc.julia = julia;
-		mc.max_iterations = max_iterations;
-		*(MandelConstantsNoDoubles *)msr.pData = mc;
+		
+	//*(MandelConstantsNoDoubles *)msr.pData = mc;
 	g_pd3dDeviceContext->Unmap(g_pcbFractal, 0);
 
 

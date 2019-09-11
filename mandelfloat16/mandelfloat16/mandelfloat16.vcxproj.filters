@@ -52,4 +52,9 @@
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="mandalfloat16.hlsl">
+      <Filter>资源文件</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>
