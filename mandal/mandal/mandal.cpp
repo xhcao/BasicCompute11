@@ -7,7 +7,7 @@
 #include <math.h>
 #include <string>
 
-//#define HALFFLOAT
+#define HALFFLOAT
 
 #define SAFE_RELEASE(object) if((object) != nullptr) (object)->Release()
 
@@ -164,6 +164,34 @@ HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	switch (message)
+	{
+		case WM_COMMAND:
+		{
+			int wmId = LOWORD(wParam);
+			switch (wmId)
+			{
+			case IDM_EXIT:
+				DestroyWindow(hWnd);
+				break;
+			default:
+				return DefWindowProc(hWnd, message, wParam, lParam);
+			}
+		}
+		break;
+		case WM_PAINT:
+		{
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(hWnd, &ps);
+			EndPaint(hWnd, &ps);
+		}
+		break;
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			break;
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
+	}
 	return 0;
 }
 
